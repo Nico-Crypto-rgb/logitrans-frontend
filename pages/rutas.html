@@ -7,12 +7,20 @@
 </head>
 <body>
     <h1>Rutas</h1>
+    
     <a href="dashboard.html">← Volver al Dashboard</a>
     
-    <table border="1">
+    <br><br>
+    
+    <button class="btn-icon" onclick="abrirModalCrear()">+ Agregar Ruta</button>
+    
+    <br><br>
+
+    <table>
         <thead>
             <tr>
                 <th>ID</th>
+                <th>Nombre</th>
                 <th>Origen</th>
                 <th>Destino</th>
                 <th>Distancia (km)</th>
@@ -20,8 +28,33 @@
             </tr>
         </thead>
         <tbody id="listaRutas">
-            </tbody>
+        </tbody>
     </table>
+
+    <div id="modalCrear" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <h3 id="modal-titulo">Gestionar Ruta</h3>
+            
+            <input type="hidden" id="ruta-id"> 
+            
+            <label>Nombre:</label>
+            <input type="text" id="ruta-nombre" class="form-control" placeholder="Ej: Ruta Principal">
+            
+            <label>Origen:</label>
+            <input type="text" id="ruta-origen" class="form-control">
+            
+            <label>Destino:</label>
+            <input type="text" id="ruta-destino" class="form-control">
+            
+            <label>Distancia (km):</label>
+            <input type="number" id="ruta-distancia" class="form-control">
+            
+            <div class="modal-actions">
+                <button class="btn-icon" onclick="guardarRuta()">Guardar</button>
+                <button class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
     <script src="../js/api.js"></script>
     <script src="../js/rutas.js"></script>
