@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Viajes - Seguimiento</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+    <nav>
+        <div class="logo"><strong>Gestión de Logística</strong></div>
+        <div class="menu">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="conductores.html">Conductores</a>
+            <a href="vehiculos.html">Vehículos</a>
+            <a href="rutas.html">Rutas</a>
+            <a href="viajes.html">Viajes</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <main>
+            <h1>Seguimiento de Viajes</h1>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="number" id="inputFilter" placeholder="ID de Programación" style="width: 200px;">
+                <button id="btnBuscar">Buscar</button>
+                <button id="btnNuevo">+ Nuevo Seguimiento</button>
+            </div>
+
+            <table id="tablaSeguimientos">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Prog. ID</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Estado</th>
+                        <th>Novedad</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodySeguimientos">
+                    </tbody>
+            </table>
+        </main>
+    </div>
+
+    <div id="modalSeguimiento" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Registrar Seguimiento</h3>
+            <form id="formSeguimiento">
+                <div class="form-group">
+                    <label>ID Programación:</label>
+                    <input type="number" id="formProgId" required>
+                </div>
+                <div class="form-group">
+                    <label>Estado:</label>
+                    <select id="formEstado" required>
+                        <option value="en-ruta">En Ruta</option>
+                        <option value="retrasado">Retrasado</option>
+                        <option value="inactivo">Inactivo</option>
+                        <option value="mantenimiento">Mantenimiento</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Novedad:</label>
+                    <textarea id="formNovedad"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-danger" id="btnCancelar">Cancelar</button>
+                    <button type="submit">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="js/viajes.js"></script>
+</body>
+</html>

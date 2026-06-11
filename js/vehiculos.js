@@ -1,134 +1,139 @@
-document.addEventListener('DOMContentLoaded', () => {
-    if (checkAuth()) {
-        cargarVehiculos();
+import { verificarSesion } from './auth.js';
+import { API, apiFetch } from './api.js';
+
+verificarSesion();
+
+let listaVehiculos = [];
+const modal = document.getElementById('modal-vehiculo');
+const form = document.getElementById('form-vehiculo');
+
+document.addEventListener('DOMContentLoaded', cargarVehiculos);
+
+async function cargarVehiculos() {
+    const tbody = document.getElementById('lista-vehiculos');
+    try {
+        const response = await apiFetch(API.vehiculos, '/vehiculos', { method: 'GET' });
+        if (response && response.success) {
+            listaVehiculos = response.data;
+            tbody.innerHTML = listaVehiculos.map(v => `
+                <tr>
+                    <td>${v.placa}</td>
+                    <td>${v.tipo_vehiculo}</td>
+                    <td>${v.capacidad_carga} Ton</td>
+                    <td>${v.modelo} / ${v.marca}</td>
+                    <td><span class="badge-${v.estado}">${v.estado}</span></td>
+                    <td>
+                        <button onclick="editarVehiculo(${v.id})">Editar</button>
+                        <button onclick="abrirModalEstado(${v.id}, '${v.estado}')">Estado</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    } catch (e) { 
+        console.error("Error al cargar vehículos:", e); 
+    }
+}
+
+// Eventos del modal
+document.getElementById('btn-nuevo').onclick = () => {
+    form.reset();
+    // CORRECCIÓN: Limpiamos el ID oculto al crear uno nuevo
+    document.getElementById('vehiculo-id').value = ''; 
+    document.getElementById('modal-titulo').innerText = "Nuevo Vehículo";
+    modal.style.display = 'flex';
+};
+
+document.getElementById('btn-cancelar').onclick = () => modal.style.display = 'none';
+
+// Evento de envío de formulario (Guardar / Actualizar)
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // 1. Obtener el ID si existe (para saber si es actualización o creación)
+    const idInput = document.getElementById('vehiculo-id');
+    const id = idInput ? idInput.value : null;
+
+    // 2. Obtener datos del formulario
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    // 3. Limpieza: Si no hay ID (es creación), eliminamos el campo 'id' del objeto 
+    // para no enviarlo al backend y evitar el error 500
+    if (!id || id === "") {
+        delete data.id;
+    }
+
+    // 4. Determinar URL y método HTTP
+    const url = id ? `/vehiculos/${id}` : '/vehiculos';
+    const method = id ? 'PUT' : 'POST';
+
+    // 5. Preparar la petición
+    const opciones = {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify(data)
+    };
+
+    // 6. Ejecutar la petición
+    try {
+        const res = await apiFetch(API.vehiculos, url, opciones);
+
+        if (res && res.success) {
+            alert(id ? 'Vehículo actualizado' : 'Vehículo creado');
+            modal.style.display = 'none';
+            form.reset(); 
+            
+            // Limpiar el campo oculto de ID después de guardar
+            if (idInput) idInput.value = ''; 
+            
+            cargarVehiculos(); // Actualizar la tabla
+        } else {
+            console.error("Error del servidor:", res);
+            alert('Error al guardar: ' + (res.message || 'Error desconocido'));
+        }
+    } catch (error) {
+        console.error("Error de red:", error);
+        alert('No se pudo conectar con el servidor');
     }
 });
-
-// 1. Cargar datos
-async function cargarVehiculos() {
-    const tbody = document.getElementById('listaVehiculos');
-    tbody.innerHTML = '<tr><td colspan="5">Cargando...</td></tr>';
-
-    try {
-        const respuesta = await vehiculosApi('/vehiculos', 'GET');
-        const vehiculos = respuesta.data || respuesta;
-        renderizarTabla(vehiculos);
-    } catch (error) {
-        console.error("Error al cargar:", error);
-        tbody.innerHTML = '<tr><td colspan="5">Error al cargar datos</td></tr>';
-    }
-}
-
-// 2. Renderizar tabla
-function renderizarTabla(vehiculos) {
-    const tbody = document.getElementById('listaVehiculos');
-    tbody.innerHTML = '';
+// Funciones globales (exponemos a window para que los botones las vean)
+window.editarVehiculo = (id) => {
+    const v = listaVehiculos.find(x => x.id == id);
+    if(!v) return;
     
-    if (vehiculos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5">No hay vehículos registrados.</td></tr>';
-        return;
+    document.getElementById('vehiculo-id').value = v.id;
+    
+    // Rellenar formulario
+    for(let key in v) {
+        const input = form.querySelector(`[name="${key}"]`);
+        if(input) input.value = v[key];
     }
+    
+    document.getElementById('modal-titulo').innerText = "Editar Vehículo";
+    modal.style.display = 'flex';
+};
 
-    vehiculos.forEach(v => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${v.id}</td>
-                <td>${v.placa}</td>
-                <td>${v.marca}</td>
-                <td>${v.estado}</td>
-                <td>
-                    <button class="btn-icon" onclick="prepararEdicion(${v.id}, '${v.placa}', '${v.marca}', '${v.estado}')">Editar</button>
-                    <button class="btn-icon" onclick="eliminarVehiculo(${v.id})" style="color: red; margin-left: 5px;">Eliminar</button>
-                </td>
-            </tr>
-        `;
+window.abrirModalEstado = (id, estado) => {
+    document.getElementById('estado-id').value = id;
+    document.getElementById('select-estado').value = estado;
+    document.getElementById('modal-estado').style.display = 'flex';
+};
+
+window.guardarEstado = async () => {
+    const id = document.getElementById('estado-id').value;
+    const estado = document.getElementById('select-estado').value;
+    
+    const res = await apiFetch(API.vehiculos, `/vehiculos/${id}/estado`, {
+        method: 'PATCH',
+        body: JSON.stringify({ estado })
     });
-}
-
-// 3. Funciones de EDICIÓN
-function prepararEdicion(id, placa, marca, estado) {
-    document.getElementById('edit-id').value = id;
-    document.getElementById('edit-placa').value = placa;
-    document.getElementById('edit-marca').value = marca;
     
-    // Al ser un select, esto seleccionará automáticamente la opción correcta
-    document.getElementById('edit-estado').value = estado; 
-    
-    document.getElementById('modalEditar').style.display = 'flex';
-}
-
-function cerrarModalEditar() {
-    document.getElementById('modalEditar').style.display = 'none';
-}
-
-async function guardarCambiosVehiculo() {
-    const id = document.getElementById('edit-id').value;
-    const data = {
-        placa: document.getElementById('edit-placa').value.trim(),
-        marca: document.getElementById('edit-marca').value.trim(),
-        estado: document.getElementById('edit-estado').value.trim()
-    };
-
-    try {
-        await vehiculosApi(`/vehiculos/${id}`, 'PUT', data);
-        alert("Vehículo actualizado correctamente");
-        cerrarModalEditar();
+    if(res && res.success) {
+        alert('Estado actualizado');
+        document.getElementById('modal-estado').style.display = 'none';
         cargarVehiculos();
-    } catch (error) {
-        console.error("Error al actualizar:", error);
-        alert("No se pudo actualizar el vehículo.");
     }
-}
-
-// 4. Funciones para CREAR
-function abrirModalCrear() {
-    document.getElementById('modalCrear').style.display = 'flex';
-}
-
-function cerrarModalCrear() {
-    document.getElementById('modalCrear').style.display = 'none';
-}
-
-async function guardarNuevoVehiculo() {
-    const data = {
-        placa: document.getElementById('crear-placa').value.trim(),
-        marca: document.getElementById('crear-marca').value.trim(),
-        tipo: document.getElementById('crear-tipo').value.trim(),
-        capacidad_kg: document.getElementById('crear-capacidad').value.trim(),
-        modelo: document.getElementById('crear-modelo').value.trim(), // Nuevo campo
-        anlo: document.getElementById('crear-anlo').value.trim(),     // Nuevo campo
-        estado: 'disponible'
-    };
-
-    // Validación básica para asegurar que no enviamos campos vacíos
-    if (!data.placa || !data.marca || !data.modelo || !data.anlo) {
-        alert("Por favor, completa todos los campos (Placa, Marca, Modelo, Año, Tipo y Capacidad).");
-        return;
-    }
-
-    try {
-        await vehiculosApi('/vehiculos', 'POST', data);
-        alert("Vehículo registrado exitosamente");
-        
-        // Limpiamos los campos después de éxito
-        cerrarModalCrear();
-        await cargarVehiculos();
-    } catch (error) {
-        console.error("Error al crear:", error);
-        alert("No se pudo registrar el vehículo. Verifica la consola.");
-    }
-}
-
-// 5. Función ELIMINAR
-async function eliminarVehiculo(id) {
-    if (confirm("¿Estás seguro de eliminar este vehículo?")) {
-        try {
-            await vehiculosApi(`/vehiculos/${id}`, 'DELETE');
-            alert("Vehículo eliminado");
-            cargarVehiculos();
-        } catch (error) {
-            console.error("Error al eliminar:", error);
-            alert("No se pudo eliminar el vehículo.");
-        }
-    }
-}
+};

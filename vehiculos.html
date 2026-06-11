@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Vehículos | LogiTrans</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">LogiTrans Express</div>
+        <ul>
+            <li><a href="dashboard.html">Inicio</a></li>
+            <li><a href="conductores.html">Conductores</a></li>
+            <li><a href="vehiculos.html"><strong>Vehículos</strong></a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <h1>Gestión de Vehículos</h1>
+        <button id="btn-nuevo" class="btn-primary">+ Nuevo Vehículo</button>
+        
+        <table id="tabla-vehiculos">
+            <thead>
+                <tr>
+                    <th>Placa</th>
+                    <th>Tipo</th>
+                    <th>Capacidad</th>
+                    <th>Modelo/Marca</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="lista-vehiculos"></tbody>
+        </table>
+    </main>
+
+    <div id="modal-vehiculo" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2 id="modal-titulo">Nuevo Vehículo</h2>
+            <form id="form-vehiculo">
+    <input type="hidden" id="vehiculo-id" name="id">
+
+    <input type="text" name="placa" placeholder="Placa" required>
+    <input type="text" name="tipo_vehiculo" placeholder="Tipo (ej. Camión)" required>
+    <input type="number" name="capacidad_carga" placeholder="Capacidad de Carga" required>
+    <input type="text" name="modelo" placeholder="Modelo" required>
+    <input type="text" name="marca" placeholder="Marca" required>
+
+    <div class="botones-accion">
+        <button type="button" id="btn-cancelar">Cancelar</button>
+        <button type="submit">Guardar</button>
+    </div>
+</form>
+        </div>
+    </div>
+
+    <div id="modal-estado" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Cambiar Estado</h2>
+            <input type="hidden" id="estado-id">
+            <select id="select-estado" style="width: 100%; padding: 10px; margin: 10px 0;">
+                <option value="disponible">Disponible</option>
+                <option value="en_ruta">En Ruta</option>
+                <option value="mantenimiento">Mantenimiento</option>
+                <option value="inactivo">Inactivo</option>
+            </select>
+            <button onclick="guardarEstado()" class="btn-primary">Guardar Estado</button>
+            <button onclick="document.getElementById('modal-estado').style.display='none'">Cancelar</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/vehiculos.js"></script>
+</body>
+</html>

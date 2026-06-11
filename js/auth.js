@@ -1,36 +1,49 @@
 // js/auth.js
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('loginForm');
-    const errorMessage = document.getElementById('errorMessage');
+import { API, apiFetch } from './api.js';
 
-    // Si ya hay token, redirigir al dashboard para no pedir login otra vez
-    if (localStorage.getItem('token')) {
-        window.location.href = 'pages/dashboard.html';
-    }
+// --- FUNCIONES PARA EXPORTAR ---
+export function verificarSesion() {
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+    return true;
+}
 
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Evita que la página recargue
-        
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+export function logout() {
+    localStorage.clear();
+    window.location.href = 'index.html';
+}
 
-        try {
-            // Utilizamos el atajo que creaste en api.js
-            // Asumiendo que tu endpoint en PHP Slim es POST /login
-            const response = await authApi('/login', 'POST', { email, password });
-            
-            // Guardamos el token y datos útiles (ajusta según lo que devuelva tu backend)
-            localStorage.setItem('token', response.token);
-            if(response.usuario) {
-                localStorage.setItem('usuario', JSON.stringify(response.usuario));
-            }
+// --- LÓGICA DEL FORMULARIO ---
+const loginForm = document.getElementById('login-form');
+if (loginForm) {
+    // js/auth.js (dentro del event listener del submit)
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-            // Redirección exitosa
-            window.location.href = 'pages/dashboard.html';
+    // Leemos el nuevo campo email
+    // js/auth.js
+// ... dentro de tu event listener ...
 
-        } catch (error) {
-            // Muestra el error en la interfaz sin usar console.log o alerts feos
-            errorMessage.textContent = error.message;
-        }
+    const emailInput = document.getElementById('email').value;
+    const passwordInput = document.getElementById('password').value;
+
+    const response = await apiFetch(API.auth, '/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({
+            login: emailInput, // <--- CAMBIA 'email' POR 'login' AQUÍ
+            password: passwordInput
+        })
     });
+
+// ... resto del código ...
+
+    if (response.token) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+        window.location.href = 'dashboard.html';
+    } else {
+        // Si hay un error, lo mostramos
+        alert(response.message || 'Error al iniciar sesión');
+    }
 });
+}

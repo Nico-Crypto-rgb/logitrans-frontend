@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>LogiTrans Express - Dashboard</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">LogiTrans Express</div>
+        <ul>
+            <a href="dashboard.html">Inicio</a>
+            <a href="conductores.html">Conductores</a>
+            <a href="vehiculos.html">Vehículos</a>
+            <a href="rutas.html">Rutas</a>
+            <a href="programacion.html">Programación</a>
+            <a href="seguimiento.html">Seguimiento</a>
+            <a href="viajes.html">Viajes</a>
+            <button id="btn-logout" style="background: #dc3545;">Salir</button>
+        </ul>
+    </nav>
+
+    <main class="dashboard-container">
+        <h1>Bienvenido al Sistema</h1>
+        <p>Selecciona un módulo del menú para comenzar.</p>
+    </main>
+
+    <script type="module">
+        import { verificarSesion, logout } from './js/auth.js';
+
+        // 1. Proteger la ruta
+        if (verificarSesion()) {
+            // 2. Si hay sesión, mostrar nombre del usuario
+            const user = JSON.parse(localStorage.getItem('user'));
+            document.querySelector('main').innerHTML += `<p>Hola, ${user.nombre}</p>`;
+        }
+
+        // 3. Configurar logout
+        document.getElementById('btn-logout').addEventListener('click', logout);
+    </script>
+</body>
+</html>

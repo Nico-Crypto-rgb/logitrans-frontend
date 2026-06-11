@@ -1,86 +1,40 @@
-// ============================================================
-// api.js — Cliente central corregido
-// ============================================================
+// js/api.js
 
-const API = {
-  auth:        'http://localhost:8001',
-  conductores: 'http://localhost:8002',
-  vehiculos:   'http://localhost:8003',
-  rutas:       'http://localhost:8004',
-  viajes:      'http://localhost:8005',
+export const API = {
+    auth: 'http://localhost:8001',
+    conductores: 'http://localhost:8002',
+    vehiculos: 'http://localhost:8003',
+    rutas: 'http://localhost:8004',
+    viajes: 'http://localhost:8005'
 };
 
-async function request(baseUrl, path, method = 'GET', body = null) {
-  const token = localStorage.getItem('token');
+export async function apiFetch(baseUrl, endpoint, options = {}) {
+    const token = localStorage.getItem('token');
+    
+    const headers = {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
 
-  const headers = {
-    'Accept': 'application/json'
-  };
+    const config = {
+        ...options,
+        headers: { ...headers, ...options.headers }
+    };
 
-  if (body !== null && body !== undefined) {
-    headers['Content-Type'] = 'application/json';
-  }
+    try {
+        const response = await fetch(`${baseUrl}${endpoint}`, config);
 
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
+        if (response.status === 401) {
+            localStorage.clear();
+            window.location.href = 'index.html';
+            return { success: false, message: 'Sesión no válida' };
+        }
 
-  const options = {
-    method,
-    headers,
-    mode: 'cors'
-  };
+        if (response.status === 204) return { success: true };
 
-  if (body !== null && body !== undefined) {
-    options.body = JSON.stringify(body);
-  }
-
-  const fullUrl = `${baseUrl}${path.startsWith('/') ? path : '/' + path}`;
-
-  try {
-      const response = await fetch(fullUrl, options);
-
-      // Si el servidor responde 401, no tenemos autorización
-      if (response.status === 401) {
-        console.warn("Sesión expirada o no autorizada");
-        localStorage.removeItem('token');
-        localStorage.removeItem('usuario');
-        
-        // Ajuste: Redirige al login, sin importar dónde esté el usuario
-        window.location.href = '/pages/login.html'; 
-        throw new Error('No autorizado');
-      }
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || data.error || 'Error en la solicitud');
-      }
-
-      return data;
-  } catch (error) {
-      console.error("Error en petición a:", fullUrl, error);
-      throw error;
-  }
-}
-
-function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
-    window.location.href = '/pages/login.html';
-}
-
-function checkAuth() {
-    if (!localStorage.getItem('token')) {
-        window.location.href = '/pages/login.html';
-        return false;
+        return await response.json();
+    } catch (error) {
+        console.error('Error en petición API:', error);
+        return { success: false, message: 'Error de conexión' };
     }
-    return true;
 }
-
-// Atajos por microservicio
-const authApi       = (path, method, body) => request(API.auth,        path, method, body);
-const conductoresApi = (path, method, body) => request(API.conductores, path, method, body);
-const vehiculosApi  = (path, method, body) => request(API.vehiculos,   path, method, body);
-const rutasApi      = (path, method, body) => request(API.rutas,       path, method, body);
-const viajesApi     = (path, method, body) => request(API.viajes,      path, method, body);

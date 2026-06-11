@@ -1,97 +1,152 @@
-/* 1. Estilos Base para mejorar la tipografía y legibilidad */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 20px;
-    background-color: #f9f9f9;
-    color: #333;
+/* css/main.css */
+
+:root {
+    /* Paleta de colores */
+    --primary: #2c3e50;
+    --secondary: #34495e;
+    --accent: #3498db;
+    --white: #ffffff;
+    --light-bg: #f4f7f6;
+    --text: #333;
+    
+    /* Colores de Estado (Logística) */
+    --color-disponible: #28a745;
+    --color-en-ruta: #007bff;
+    --color-mantenimiento: #fd7e14;
+    --color-retrasado: #ffc107;
+    --color-inactivo: #6c757d;
+    --color-peligro: #dc3545;
 }
 
-/* 2. Estilo de la Tabla: Limpia y responsiva */
+/* Reset Básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-bg);
+    color: var(--text);
+    line-height: 1.6;
+}
+
+/* Layout Principal */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+main {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+/* Componentes - Navbar */
+nav {
+    background: var(--primary);
+    color: var(--white);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav a {
+    color: var(--white);
+    text-decoration: none;
+    margin-left: 15px;
+}
+
+/* Tablas */
 table {
     width: 100%;
     border-collapse: collapse;
-    background-color: white;
-    margin-top: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    background: var(--white);
 }
 
 th, td {
     padding: 12px;
-    border: 1px solid #ddd;
     text-align: left;
+    border-bottom: 1px solid #ddd;
 }
 
-th {
-    background-color: #f2f2f2;
+/* Badges (Indicadores de Estado) */
+.badge {
+    padding: 5px 10px;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.85em;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.bg-disponible { background-color: var(--color-disponible); }
+.bg-en-ruta { background-color: var(--color-en-ruta); }
+.bg-mantenimiento { background-color: var(--color-mantenimiento); }
+.bg-retrasado { background-color: var(--color-retrasado); }
+.bg-inactivo { background-color: var(--color-inactivo); }
+.bg-peligro { background-color: var(--color-peligro); }
+
+/* Formularios */
+.form-group {
+    margin-bottom: 15px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--accent);
+    color: white;
     font-weight: bold;
 }
 
-/* 3. CORRECCIÓN: Estilo del desplegable (Select) */
-.form-select {
-    width: 100%;          /* Asegura que ocupe toda la celda */
-    padding: 8px;
-    border: 1px solid #ccc;
+button:hover {
+    opacity: 0.9;
+}
+
+button.btn-danger {
+    background-color: var(--color-peligro);
+}
+
+/* Mensajes de feedback */
+.mensaje {
+    padding: 15px;
+    margin: 10px 0;
     border-radius: 4px;
-    box-sizing: border-box; /* Crucial: evita que el padding rompa el diseño */
-    background-color: #fff;
-    cursor: pointer;
+    display: none;
 }
+.mensaje.success { background-color: #d4edda; color: #155724; display: block; }
+.mensaje.error { background-color: #f8d7da; color: #721c24; display: block; }
+.badge-disponible { background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; }
+.badge-en_ruta { background-color: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; }
+.badge-inactivo { background-color: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 4px; }
 
-.form-select:focus {
-    outline: none;
-    border-color: #007bff;
-}
-
-/* 4. Estilos para los botones */
-.btn-icon {
-    padding: 6px 12px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-.btn-icon:hover {
-    background-color: #0056b3;
-}
-
-/* 5. Utilidad para centrar texto */
-.text-center { text-align: center; }
-.error-text { color: red; font-weight: bold; }
-
-/* Estilos para el modal */
-.modal-overlay {
+.modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
 }
-
 .modal-content {
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
-    width: 400px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    background: white; padding: 20px; border-radius: 8px;
+    width: 400px; max-width: 90%;
 }
-
-.modal-content label { display: block; margin-top: 10px; font-weight: bold; }
-.form-control { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
-.modal-actions { margin-top: 20px; display: flex; gap: 10px; }
-
-.btn-secondary {
-    padding: 8px 12px;
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.modal-content input {
+    display: block; width: 100%; margin-bottom: 10px; padding: 8px;
 }
+.modal-actions { display: flex; justify-content: space-between; margin-top: 15px; }
+
+.badge-mantenimiento { background-color: #e2e3e5; color: #383d41; padding: 4px 8px; border-radius: 4px; }

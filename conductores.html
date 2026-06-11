@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Conductores | LogiTrans</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">LogiTrans Express</div>
+        <ul>
+            <a href="dashboard.html">Inicio</a>
+            <a href="conductores.html"><strong>Conductores</strong></a>
+            <a href="vehiculos.html">Vehículos</a>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <h1>Gestión de Conductores</h1>
+        <button id="btn-nuevo" class="btn-primary">+ Nuevo Conductor</button>
+        
+        <table id="tabla-conductores">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Licencia</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="lista-conductores">
+                </tbody>
+        </table>
+    </main>
+
+    <script type="module" src="js/conductores.js"></script>
+
+    <div id="modal-conductor" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Registrar Nuevo Conductor</h2>
+        <form id="form-conductor">
+            <input type="hidden" id="conductor-id" name="id">
+            <input type="text" name="nombres" placeholder="Nombres" required>
+            <input type="text" name="apellidos" placeholder="Apellidos" required>
+            <input type="text" name="documento" placeholder="Documento" required>
+            <input type="text" name="telefono" placeholder="Teléfono" required>
+            <input type="email" name="correo" placeholder="Correo electrónico" required>
+            <input type="text" name="numero_licencia" placeholder="Número de Licencia" required>
+            <input type="text" name="categoria_licencia" placeholder="Categoría" required>
+            <input type="date" name="fecha_vencimiento_licencia" title="Fecha vencimiento" required>
+            
+            <div class="modal-actions">
+                <button type="button" id="btn-cancelar" class="btn-secondary">Cancelar</button>
+                <button type="submit" class="btn-primary">Guardar Conductor</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div id="modal-estado" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Cambiar Estado</h2>
+        <input type="hidden" id="estado-id">
+        <select id="select-estado" style="width: 100%; padding: 10px; margin: 10px 0;">
+            <option value="disponible">Disponible</option>
+            <option value="en_ruta">En Ruta</option>
+            <option value="inactivo">Inactivo</option>
+        </select>
+        <button onclick="guardarEstado()" class="btn-primary">Guardar Estado</button>
+        <button onclick="document.getElementById('modal-estado').style.display='none'">Cancelar</button>
+    </div>
+</div>
+
+
+</body>
+</html>
