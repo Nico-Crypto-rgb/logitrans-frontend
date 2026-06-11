@@ -150,3 +150,19 @@ button.btn-danger {
 .modal-actions { display: flex; justify-content: space-between; margin-top: 15px; }
 
 .badge-mantenimiento { background-color: #e2e3e5; color: #383d41; padding: 4px 8px; border-radius: 4px; }
+
+/* Estilos para los estados */
+.badge {
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: white;
+    display: inline-block;
+}
+
+.status-en-ruta { background-color: #28a745; } /* Verde */
+.status-retrasado { background-color: #ffc107; color: #000; } /* Amarillo */
+.status-inactivo { background-color: #6c757d; } /* Gris */
+.status-mantenimiento { background-color: #dc3545; } /* Rojo */
+.status-default { background-color: #17a2b8; } /* Azul para otros */

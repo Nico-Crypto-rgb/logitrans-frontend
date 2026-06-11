@@ -6,6 +6,25 @@ const modal = document.getElementById('modalSeguimiento');
 const form = document.getElementById('formSeguimiento');
 
 // 1. Función principal: Cargar datos
+
+function getEstadoClass(estado) {
+    if (!estado) return 'status-default';
+    
+    // Normalizar el string (por si viene con guiones o guiones bajos)
+    const claseBase = estado.toLowerCase().replace('_', '-');
+    
+    const clases = {
+        'en-ruta': 'status-en-ruta',
+        'en-transito': 'status-en-ruta',
+        'retrasado': 'status-retrasado',
+        'inactivo': 'status-inactivo',
+        'mantenimiento': 'status-mantenimiento'
+    };
+    
+    return clases[claseBase] || 'status-default';
+}
+
+
 async function cargarSeguimientos() {
     const filterId = document.getElementById('inputFilter').value;
     let endpoint = '/seguimientos';
@@ -26,21 +45,19 @@ async function cargarSeguimientos() {
 // 2. Renderizado de tabla
 function renderTable(data) {
     tbody.innerHTML = '';
-    
     data.forEach(item => {
-        const estadoClase = `bg-${item.estado.replace(' ', '-')}`;
+        const clase = getEstadoClass(item.estado); // Obtenemos la clase
         
-        const row = `
+        tbody.innerHTML += `
             <tr>
                 <td>${item.id}</td>
-                <td>${item.programacion_viaje_id}</td>
+                <td>${item.prog_id}</td>
                 <td>${item.fecha}</td>
                 <td>${item.hora}</td>
-                <td><span class="badge ${estadoClase}">${item.estado}</span></td>
+                <td><span class="badge ${clase}">${item.estado || 'N/A'}</span></td>
                 <td>${item.novedad || '-'}</td>
             </tr>
         `;
-        tbody.innerHTML += row;
     });
 }
 
