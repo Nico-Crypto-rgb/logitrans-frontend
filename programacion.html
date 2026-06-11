@@ -2,29 +2,88 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Programación de Viajes</title>
+    <title>Gestión de Programación</title>
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 
-    <div class="container">
-        <h1>Programación de Viajes</h1>
-        <button id="btn-nuevo-viaje" class="btn btn-primary">+ Nueva Programación</button>
-        
-        <table>
-    <thead>
-        <tr>
-            <th>Ruta</th>
-            <th>Conductor</th>
-            <th>Vehículo</th>
-            <th>Fecha / Hora Salida</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody id="tabla-programacion">
-        </tbody>
-</table>
+    <nav>
+        <div class="logo"><strong>Gestión de Logística</strong></div>
+        <div class="menu">
+            <a href="dashboard.html">Inicio</a>
+            <a href="conductores.html">Conductores</a>
+            <a href="vehiculos.html">Vehículos</a>
+            <a href="rutas.html">Rutas</a>
+            <a href="programacion.html">Programación</a>
+            <a href="viajes.html">Viajes</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <main>
+            <h1>Programación de Viajes</h1>
+            
+            <div style="margin-bottom: 20px;">
+                <button id="btnNuevo">+ Nueva Programación</button>
+            </div>
+
+            <table id="tablaProgramacion">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ruta</th>
+                        <th>Conductor</th>
+                        <th>Vehículo</th>
+                        <th>Salida</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyProgramacion">
+                    </tbody>
+            </table>
+        </main>
+    </div>
+
+    <div id="modalProgramacion" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3 id="modalTitle">Nueva Programación</h3>
+            <form id="formProgramacion">
+                <input type="hidden" id="progId">
+                <div class="form-group">
+                    <label>Ruta ID:</label>
+                    <input type="number" id="ruta_id" required>
+                </div>
+                <div class="form-group">
+                    <label>Conductor ID:</label>
+                    <input type="number" id="conductor_id" required>
+                </div>
+                <div class="form-group">
+                    <label>Vehículo ID:</label>
+                    <input type="number" id="vehiculo_id" required>
+                </div>
+                <div class="form-group">
+                    <label>Fecha Salida:</label>
+                    <input type="date" id="fecha_salida" required>
+                </div>
+                <div class="form-group">
+                    <label>Hora Salida:</label>
+                    <input type="time" id="hora_salida" required>
+                </div>
+                <div class="form-group">
+                    <label>Fecha Estimada Llegada:</label>
+                    <input type="date" id="fecha_estimada_llegada" required>
+                </div>
+                <div class="form-group">
+                    <label>Observaciones:</label>
+                    <textarea id="observaciones"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-danger" id="btnCancelar">Cancelar</button>
+                    <button type="submit">Guardar</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script type="module" src="js/programacion.js"></script>

@@ -1,72 +1,115 @@
-import { verificarSesion } from './auth.js';
 import { API, apiFetch } from './api.js';
 
-// 1. Carga inicial de datos
-async function cargarProgramaciones() {
+const tbody = document.getElementById('tbodyProgramacion');
+const modal = document.getElementById('modalProgramacion');
+const form = document.getElementById('formProgramacion');
+
+// Cargar todas las programaciones
+async function cargarProgramacion() {
     const response = await apiFetch(API.programacion, '/programacion');
-
-    if (response && response.success) {
-        renderizarTabla(response.data);
+    if (response.success) {
+        renderTable(response.data);
     } else {
-        console.error('Error al cargar:', response?.message);
+        tbody.innerHTML = '<tr><td colspan="7">Error al cargar datos.</td></tr>';
     }
 }
 
-// 2. Renderizar filas en la tabla
-// ... dentro de tu función renderizarTabla ...
-
-function renderizarTabla(datos) {
-    // Esto debe coincidir exactamente con el ID que pusiste en el HTML
-    const tbody = document.getElementById('tabla-programacion'); 
-    
-    // Si tbody es null, aquí es donde salta el error que ves en consola
-    if (!tbody) {
-        console.error("Error: No se encontró el elemento con ID 'tabla-programacion' en el HTML.");
-        return;
-    }
-
-    tbody.innerHTML = ''; // Limpiar tabla antes de llenar
-
-    datos.forEach(prog => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${prog.ruta_id}</td>
-            <td>${prog.conductor_id}</td>
-            <td>${prog.vehiculo_id}</td>
-            <td>${prog.fecha_salida} ${prog.hora_salida}</td>
-            <td>${prog.estado}</td>
-            <td>
-                <button>Editar</button>
-                <button>Eliminar</button>
-            </td>
+// Dibujar tabla
+function renderTable(data) {
+    tbody.innerHTML = '';
+    data.forEach(item => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${item.id}</td>
+                <td>${item.ruta_id}</td>
+                <td>${item.conductor_id}</td>
+                <td>${item.vehiculo_id}</td>
+                <td>${item.fecha_salida} ${item.hora_salida}</td>
+                <td>${item.estado}</td>
+                <td>
+                    <button onclick="prepararEdicion(${item.id})">Editar</button>
+                    <button class="btn-danger" onclick="eliminarProgramacion(${item.id})">Eliminar</button>
+                </td>
+            </tr>
         `;
-        tbody.appendChild(tr);
     });
 }
 
-// 3. Función eliminar
-async function eliminarViaje(id) {
-    if (!confirm('¿Estás seguro de eliminar esta programación?')) return;
+// Guardar (Crear o Actualizar)
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('progId').value;
+    const payload = {
+        ruta_id: document.getElementById('ruta_id').value,
+        conductor_id: document.getElementById('conductor_id').value,
+        vehiculo_id: document.getElementById('vehiculo_id').value,
+        fecha_salida: document.getElementById('fecha_salida').value,
+        hora_salida: document.getElementById('hora_salida').value,
+        fecha_estimada_llegada: document.getElementById('fecha_estimada_llegada').value,
+        observaciones: document.getElementById('observaciones').value
+    };
 
-    const response = await apiFetch(API.programacion, `/programacion/${id}`, {
-        method: 'DELETE'
+    const method = id ? 'PUT' : 'POST';
+    const endpoint = id ? `/programacion/${id}` : '/programacion';
+
+    const response = await apiFetch(API.programacion, endpoint, {
+        method: method,
+        body: JSON.stringify(payload)
     });
 
-    if (response && response.success) {
-        alert('Programación eliminada');
-        cargarProgramaciones(); // Recargar tabla
+    if (response.success) {
+        alert('Operación exitosa');
+        toggleModal(false);
+        cargarProgramacion();
     } else {
-        alert('Error al eliminar');
+        alert('Error: ' + (response.message || 'No se pudo guardar'));
     }
+});
+
+// Editar - Prepara el modal con datos
+window.prepararEdicion = async (id) => {
+    const response = await apiFetch(API.programacion, `/programacion/${id}`);
+    if (response.success) {
+        const d = response.data;
+        document.getElementById('progId').value = d.id;
+        document.getElementById('ruta_id').value = d.ruta_id;
+        document.getElementById('conductor_id').value = d.conductor_id;
+        document.getElementById('vehiculo_id').value = d.vehiculo_id;
+        document.getElementById('fecha_salida').value = d.fecha_salida;
+        document.getElementById('hora_salida').value = d.hora_salida;
+        document.getElementById('fecha_estimada_llegada').value = d.fecha_estimada_llegada;
+        document.getElementById('observaciones').value = d.observaciones || '';
+        
+        document.getElementById('modalTitle').innerText = 'Editar Programación';
+        toggleModal(true);
+    }
+};
+
+// Eliminar
+window.eliminarProgramacion = async (id) => {
+    if (confirm('¿Estás seguro de eliminar esta programación?')) {
+        const response = await apiFetch(API.programacion, `/programacion/${id}`, { method: 'DELETE' });
+        if (response.success) {
+            cargarProgramacion();
+        } else {
+            alert('Error al eliminar');
+        }
+    }
+};
+
+// Helpers
+function toggleModal(show) {
+    modal.style.display = show ? 'flex' : 'none';
+    if (!show) form.reset();
 }
 
-// 4. Inicialización
 document.addEventListener('DOMContentLoaded', () => {
-    cargarProgramaciones();
-    
-    // Listener para el botón nuevo
-    document.getElementById('btn-nuevo-viaje').addEventListener('click', () => {
-        console.log("Abrir modal de creación aquí");
-        // Tu lógica para abrir modal
+    document.getElementById('btnNuevo').addEventListener('click', () => {
+        document.getElementById('progId').value = '';
+        document.getElementById('modalTitle').innerText = 'Nueva Programación';
+        toggleModal(true);
     });
+    
+    document.getElementById('btnCancelar').addEventListener('click', () => toggleModal(false));
+    cargarProgramacion();
 });
